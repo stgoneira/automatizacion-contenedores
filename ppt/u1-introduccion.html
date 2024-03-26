@@ -1,0 +1,134 @@
+<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+		<title>Unidad 1 - Automatización de Contenedores</title>
+
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/5.0.2/reset.min.css" />
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/5.0.2/reveal.min.css" />
+		
+		<!-- otros themes: https://revealjs.com/themes/ Ejemplos: black, white, league, beige, sky, night, serif, simple, solarized, blood, moon -->
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/5.0.2/theme/white.min.css" />
+		<!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/5.0.2/theme/blood.min.css" /> -->
+
+		<!-- Theme used for syntax highlighted code -->
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/5.0.2/plugin/highlight/monokai.min.css" />
+		
+		<link rel="stylesheet" href="estilo.css" />
+		
+		<!-- plugin notación matemática -->
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/5.0.2/plugin/math/math.min.js"></script>
+	</head>
+	<body>
+		<div class="reveal">
+			<div class="slides">
+				<section data-separator="^---$" data-separator-vertical="^===$" data-separator-notes="^Note:" data-markdown data-line-numbers>
+    				<textarea data-template>
+## [Unidad 1](#)
+### Automatización de Contenedores
+
+---
+## [¿De qué trata el curso?](#)
+
+- Trabajo con contenedores Docker
+- En entornos de trabajo Linux tipo Redhat 
+- Y gestión de clústeres usando Kubernetes (K8)
+
+---
+## [Unidad 1](#)
+
+1. Instalación Oracle Linux 
+1. Usar Rocky Linux en Azure 
+1. Conexión SSH (PuTTY u otro cliente)
+1. Repaso comandos CLI Linux 
+1. Instalación de Docker
+1. Gestión de contenedores 
+
+---
+## [Oracle Linux](#)
+
+- Instalación en Máquina Virtual Local 
+- Puede usar software de Virtualización de su preferencia 
+- Ejemplos: VirtualBox, VMWare Player, Parallels, etc 
+- Es importante que la conexión de red generada permita visibilidad entre la VM y el host 
+
+---
+## [Rocky Linux (Cloud Azure)](#)
+
+- Crear cuenta en Cloud de Azure (estudiante)
+- Sin necesidad de colocar tarjeta bancaria
+- https://azure.microsoft.com/en-us/free/students 
+- Usar correo de alumno de [Iplacex](#) para que funcione 
+- Hay restricciones en este tipo de cuenta que no permite instalar Oracle Linux 
+- Por esta razón utilizaremos acá [Rocky Linux](#) como una distro compatible con RHEL 
+
+---
+## [Conexión SSH](#)
+
+- Es posible conectarse remotamente a un servidor Linux 
+- Para aquello se usa el protocolo SSH 
+- En Windows el cliente más conocido es PuTTY 
+- Si utiliza Linux o Mac NO necesita PuTTY 
+
+---
+## [Moverse en Linux](#)
+
+- Es importante saber moverse en Linux 
+- Linux es el Sistema Operativo más usado en Servidores 
+- Conocer los comandos básicos 
+- Edición de archivos (vi, nano, otros)
+
+---
+## [Instalar Docker](#)
+
+- Preparar el ambiente 
+- Instalar los paquetes necesarios 
+- Comprender la existencia de varias implementaciones (Redhat y Docker)
+- Levantar o activar el servicio de Docker
+
+---
+## [Gestión de Contenedores](#)
+
+- Buscar imágenes en Docker Hub
+- Correr contenedores 
+- Cambiar variables de ambiente 
+- Montar carpetas de archivos 
+- Publicar puertos de red 
+- Detener contenedores 
+- Eliminar contenedores 
+- Eliminar imágenes 
+
+---
+## [Gracias](#)
+
+				    </textarea>
+				</section>
+			</div>
+		</div>
+
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/5.0.2/reveal.min.js"></script>
+
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/5.0.2/plugin/notes/notes.min.js"></script>
+		
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/5.0.2/plugin/markdown/markdown.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/5.0.2/plugin/highlight/highlight.min.js"></script>
+		<script>			
+			Reveal.initialize({
+				hash: true,
+				plugins: [ RevealMarkdown, RevealHighlight, RevealNotes, RevealMath.KaTeX ]
+			});
+			Reveal.on('ready', e => {
+				// e.previousSlide, e.currentSlide, e.indexh, e.indexv 				
+				const claseSlide = `slide-${e.indexh}-${e.indexv}`
+				document.body.className = `reveal-viewport ${claseSlide}`
+			});
+			Reveal.on('slidechanged', e => {
+				// e.previousSlide, e.currentSlide, e.indexh, e.indexv 				
+				const claseSlide = `slide-${e.indexh}-${e.indexv}`
+				document.body.className = `reveal-viewport ${claseSlide}`
+			});
+		</script>
+	</body>
+</html>

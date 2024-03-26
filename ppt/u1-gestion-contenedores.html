@@ -1,0 +1,137 @@
+<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+		<title>Unidad 1 - Automatización de Contenedores</title>
+
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/5.0.2/reset.min.css" />
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/5.0.2/reveal.min.css" />
+		
+		<!-- otros themes: https://revealjs.com/themes/ Ejemplos: black, white, league, beige, sky, night, serif, simple, solarized, blood, moon -->
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/5.0.2/theme/white.min.css" />
+		<!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/5.0.2/theme/blood.min.css" /> -->
+
+		<!-- Theme used for syntax highlighted code -->
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/5.0.2/plugin/highlight/monokai.min.css" />
+		
+		<link rel="stylesheet" href="estilo.css" />
+		
+		<!-- plugin notación matemática -->
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/5.0.2/plugin/math/math.min.js"></script>
+	</head>
+	<body>
+		<div class="reveal">
+			<div class="slides">
+				<section data-separator="^---$" data-separator-vertical="^===$" data-separator-notes="^Note:" data-markdown data-line-numbers>
+    				<textarea data-template>
+## [Unidad 1](#)
+### Gestión de Contenedores
+
+---
+## [Docker Hub](#)
+
+Buscar imágenes en Docker Hub:
+
+ https://hub.docker.com/
+
+---
+## [Crear un contenedor](#)
+
+```bash
+$ sudo docker run --name servidor_web -d nginx:1.25.4-alpine3.18
+```
+
+---
+## [Ver contenedores](#)
+
+```bash
+$ sudo docker ps 
+$ sudo docker ps --all 
+```
+
+---
+## [Exponer puertos](#)
+
+```bash
+$ sudo docker run --name servidor_web2 -p 8080:80 -d nginx:1.25.4-alpine3.18
+```
+
+---
+## [Montar carpeta](#)
+
+```bash
+$ sudo docker run \\
+--name servidor_web3 \\
+-p 8080:80 \\
+-d \\
+--rm \\
+-v /home/santiago/mipaginaweb:/usr/share/nginx/html \\
+nginx:1.25.4-alpine3.18
+```
+
+https://docs.docker.com/storage/bind-mounts/
+
+---
+## [Detener un contenedor](#)
+
+```bash
+$ sudo docker stop servidor_web 
+$ sudo docker stop servidor_web2 
+$ sudo docker stop servidor_web3 
+```
+
+---
+## [Eliminar un contenedor](#)
+
+```bash
+$ sudo docker rm servidor_web
+$ sudo docker rm servidor_web2
+```
+
+---
+## [Ver imágenes](#)
+
+```bash
+$ sudo docker images 
+```
+
+---
+## [Eliminar imagen](#)
+
+```bash
+$ sudo docker rmi nginx:1.25.4-alpine3.18
+```
+
+
+
+				    </textarea>
+				</section>
+			</div>
+		</div>
+
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/5.0.2/reveal.min.js"></script>
+
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/5.0.2/plugin/notes/notes.min.js"></script>
+		
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/5.0.2/plugin/markdown/markdown.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/5.0.2/plugin/highlight/highlight.min.js"></script>
+		<script>			
+			Reveal.initialize({
+				hash: true,
+				plugins: [ RevealMarkdown, RevealHighlight, RevealNotes, RevealMath.KaTeX ]
+			});
+			Reveal.on('ready', e => {
+				// e.previousSlide, e.currentSlide, e.indexh, e.indexv 				
+				const claseSlide = `slide-${e.indexh}-${e.indexv}`
+				document.body.className = `reveal-viewport ${claseSlide}`
+			});
+			Reveal.on('slidechanged', e => {
+				// e.previousSlide, e.currentSlide, e.indexh, e.indexv 				
+				const claseSlide = `slide-${e.indexh}-${e.indexv}`
+				document.body.className = `reveal-viewport ${claseSlide}`
+			});
+		</script>
+	</body>
+</html>
