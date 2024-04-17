@@ -1,0 +1,267 @@
+<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+		<title>Unidad 2 - Automatización de Contenedores</title>
+
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/5.0.2/reset.min.css" />
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/5.0.2/reveal.min.css" />
+		
+		<!-- otros themes: https://revealjs.com/themes/ Ejemplos: black, white, league, beige, sky, night, serif, simple, solarized, blood, moon -->
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/5.0.2/theme/white.min.css" />
+		<!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/5.0.2/theme/blood.min.css" /> -->
+
+		<!-- Theme used for syntax highlighted code -->
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/5.0.2/plugin/highlight/monokai.min.css" />
+		
+		<link rel="stylesheet" href="estilo.css" />
+		
+		<!-- plugin notación matemática -->
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/5.0.2/plugin/math/math.min.js"></script>
+	</head>
+	<body>
+		<div class="reveal">
+			<div class="slides">
+				<section data-separator="^---$" data-separator-vertical="^===$" data-separator-notes="^Note:" data-markdown data-line-numbers>
+    				<textarea data-template>
+## [Unidad 2](#)
+### Redes
+
+---
+## [Bridge por defecto](#)
+
+- La [red por defecto](#) en Docker 
+- [NO](#) permite el [cambio en caliente](#) 
+- [NO](#) es [recomendada](#), porque no hay aislación entre contenedores 
+- Se puede [alcanzar](#) otros contenedores por [IP](#), no por nombre  
+
+===
+## [Bridge por defecto](#)
+
+```bash
+$ sudo docker network ls 
+
+$ sudo docker run --rm -d --name webserv1 nginx:alpine-slim
+$ sudo docker run --rm -d --name webserv2 nginx:alpine-slim
+
+$ sudo docker network inspect bridge 
+```
+
+===
+## [Bridge por defecto](#)
+
+Comunicación
+```bash
+$ sudo docker exec -it webserv1 ping -c 3 webserv2 # fallo 
+$ sudo docker exec -it webserv1 ping -c 3 172.17.0.3 # ok
+```
+
+===
+## [Bridge por defecto](#)
+
+Parar y eliminar contenedores 
+```bash
+$ sudo docker stop webserv1
+$ sudo docker stop webserv2
+```
+
+
+---
+## [Bridge personalizada](#)
+
+- Se prefiere una red Bridge personalizada sobre la por defecto 
+- [Permite conexión](#) en [caliente](#) 
+- Contenedores en [otras redes](#)  quedan [aislados](#)  
+- Se puede [alcanzar](#)  otros contenedores por [IP](#)  y por [nombre](#)  en la misma red 
+
+===
+## [Bridge personalizada](#)
+
+Ejemplo
+```bash 
+$ sudo docker network create b1 
+$ sudo docker network create b2 
+
+$ sudo docker run --rm -d --network b1 --name webserv1 nginx:alpine-slim
+$ sudo docker run --rm -d --network b2 --name webserv2 nginx:alpine-slim
+$ sudo docker run --rm -d --network b1 --name webserv3 nginx:alpine-slim
+
+$ sudo docker network inspect b1
+$ sudo docker network inspect b2
+```
+
+===
+## [Bridge personalizada](#)
+
+Alcance
+```bash 
+$ sudo docker exec -it webserv1 ping -c 3 webserv3
+$ sudo docker exec -it webserv1 ping -c 3 webserv2
+```
+
+===
+## [Bridge personalizada](#)
+
+Conexión en caliente
+```bash 
+$ sudo docker network connect b1 webserv2
+$ sudo docker exec -it webserv1 ping -c 3 webserv2
+```
+
+===
+## [Bridge personalizada](#)
+
+Eliminar
+```bash 
+$ sudo docker stop webserv1 webserv2 webserv3
+$ sudo docker network rm b1 b2 
+```
+
+---
+## [Host](#)
+
+- [Publica](#) directamente los [puertos](#) de los contenedores [al anfitrión](#) 
+- Mejora el rendimiento al [evitar](#) la [encapsulación y desencapsulación](#) 
+- Es más [inseguro](#) ya que no existe aislación 
+
+===
+## [Host](#)
+
+Ejemplo
+```bash 
+$ sudo docker network ls 
+
+$ sudo docker run -d --rm --name bd --network host \ 
+    -e MARIADB_ROOT_PASSWORD=Ipla1234 \ 
+	-e MARIADB_DATABASE=wordpress \
+	mariadb:11.3.2-jammy 	
+
+$ sudo docker run -d --rm --name wp --network host \
+	wordpress:6.5.2-apache
+
+$ sudo firewall-cmd --add-service=http
+```
+
+===
+## [Host](#)
+
+Parar y eliminar contenedores
+```bash 
+$ sudo docker stop bd wp 
+```
+
+
+---
+## [MACvlan](#)
+
+- Permite la asignación de direcciones [MAC únicas](#) a contenedores
+- El [contenedor parece uno más](#) en la red 
+- Útil para [integrar aplicaciones](#) que requieren esta condición 
+
+===
+## [MACvlan](#)
+
+Ejemplo
+```bash
+$ sudo docker network create -d macvlan \
+--subnet=192.168.124.0/24 \
+--gateway=192.168.124.1 \
+-o parent=enp1s0 \
+mi_red_macvlan
+
+$ sudo docker run --rm -d \
+--network mi_red_macvlan \ 
+--name webserv1 \
+--ip 192.168.124.200 \
+nginx:alpine-slim
+
+$ sudo docker network inspect mi_red_macvlan
+```
+
+---
+## [IPvlan](#)
+
+- Muy similar a MACvlan, pero la MAC es la de la interfaz padre 
+- Puede funcionar en [modo L2](#) o [L3](#) 
+- En [L2](#) funciona como un [Switch](#) 
+- En [L3](#) funciona como un [Router](#) 
+- También se puede usar Trunk Bridge 802.1Q ([sub-interfaces](#))
+
+===
+## [IPvlan L2](#)
+
+Ejemplo simple
+```bash 
+$ sudo docker network create \ 
+-d ipvlan \
+--subnet=192.168.124.0/24 \
+-o parent=enp1s0 \
+red_ipvlan
+
+$ sudo docker run --rm -d \
+--network red_ipvlan \ 
+--name webserv1 \
+nginx:alpine-slim
+```
+
+===
+## [IPvlan L2](#)
+
+Ejemplo 802.1Q
+```bash 
+$ sudo docker network create -d ipvlan \ 
+--subnet=192.168.200.0/24 --subnet=192.168.201.0/24 \
+--gateway=192.168.200.254 --gateway=192.168.201.254 \
+-o parent=enp1s0.200 \
+-o ipvlan_mode=l2 \ 
+red_ipvlan_l2
+
+$ sudo docker run --rm -d \
+--network red_ipvlan_l2 \ 
+--name webserv1 \
+nginx:alpine-slim
+```
+
+===
+## [IPvlan L3](#)
+
+Ejemplo 802.1Q
+```bash 
+$ sudo docker network create -d ipvlan \ 
+--subnet=192.168.200.0/24 --subnet=192.168.201.0/24 \
+--gateway=192.168.200.254 --gateway=192.168.201.254 \
+-o parent=enp1s0.200 \
+-o ipvlan_mode=l3 \ 
+red_ipvlan_l3
+```
+				    </textarea>
+				</section>
+			</div>
+		</div>
+
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/5.0.2/reveal.min.js"></script>
+
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/5.0.2/plugin/notes/notes.min.js"></script>
+		
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/5.0.2/plugin/markdown/markdown.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/5.0.2/plugin/highlight/highlight.min.js"></script>
+		<script>			
+			Reveal.initialize({
+				hash: true,
+				plugins: [ RevealMarkdown, RevealHighlight, RevealNotes, RevealMath.KaTeX ]
+			});
+			Reveal.on('ready', e => {
+				// e.previousSlide, e.currentSlide, e.indexh, e.indexv 				
+				const claseSlide = `slide-${e.indexh}-${e.indexv}`
+				document.body.className = `reveal-viewport ${claseSlide}`
+			});
+			Reveal.on('slidechanged', e => {
+				// e.previousSlide, e.currentSlide, e.indexh, e.indexv 				
+				const claseSlide = `slide-${e.indexh}-${e.indexv}`
+				document.body.className = `reveal-viewport ${claseSlide}`
+			});
+		</script>
+	</body>
+</html>

@@ -1,0 +1,222 @@
+<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+		<title>Unidad 2 - Automatización de Contenedores</title>
+
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/5.0.2/reset.min.css" />
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/5.0.2/reveal.min.css" />
+		
+		<!-- otros themes: https://revealjs.com/themes/ Ejemplos: black, white, league, beige, sky, night, serif, simple, solarized, blood, moon -->
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/5.0.2/theme/white.min.css" />
+		<!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/5.0.2/theme/blood.min.css" /> -->
+
+		<!-- Theme used for syntax highlighted code -->
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/5.0.2/plugin/highlight/monokai.min.css" />
+		
+		<link rel="stylesheet" href="estilo.css" />
+		
+		<!-- plugin notación matemática -->
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/5.0.2/plugin/math/math.min.js"></script>
+	</head>
+	<body>
+		<div class="reveal">
+			<div class="slides">
+				<section data-separator="^---$" data-separator-vertical="^===$" data-separator-notes="^Note:" data-markdown data-line-numbers>
+    				<textarea data-template>
+## [Unidad 2](#)
+### Imágenes
+
+---
+## [Introducción](#)
+
+1. Gestión de imágenes 
+1. Imágenes personalizadas 
+1. Caché y Capas 
+1. Docker Hub
+
+---
+## [Búsqueda de imágenes](#)
+
+- El repositorio público principal para buscar imágenes: 
+https://hub.docker.com/
+- Se puede descargar la imagen con ["docker pull"](#)
+
+```bash
+$ sudo docker pull nombre_imagen:etiqueta 
+```
+
+- O correr un contenedor con ["docker run"](#)
+```bash
+$ sudo docker run nombre_imagen:etiqueta 
+```
+
+
+===
+## [Gestión de imágenes](#)
+
+- Listar imágenes 
+- Eliminar imágenes 
+
+```bash
+$ sudo docker images
+$ sudo docker rmi image_id_aqui 
+```
+
+===
+## [Gestión de imágenes](#)
+
+<iframe width="560" height="315" src="https://www.youtube.com/embed/8KNEFhY3GPU?si=ZV6-yVymPSLoSIVp" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+
+---
+## [Imágenes personalizadas](#)
+
+- Docker permite la creación de imágenes personalizadas 
+- Generalmente se utiliza una [imagen oficial](#) como [base](#) 
+- Aunque también se puede [crear](#) una [imagen desde cero](#) 
+
+===
+## [Imágenes personalizadas](#)
+
+- Se debe [crear una carpeta](#) para colocar los archivos que se usarán en la creación de la imagen 
+- Se debe crear un archivo llamado ["Dockerfile"](#)
+- El Dockerfile contiene las [instrucciones](#) para la creación de la imagen 
+
+===
+## [Ej. Imagen personalizada](#)
+
+```
+.
+├── Dockerfile
+└── index.html
+```
+
+===
+## [Ej. Imagen personalizada](#)
+
+[Dockerfile](https://docs.docker.com/reference/dockerfile/)
+```dockerfile
+FROM oraclelinux:9
+RUN dnf install -y nginx && dnf clean all 
+WORKDIR /usr/share/nginx/html 
+COPY index.html . 
+EXPOSE 80/tcp 
+CMD ["nginx", "-g", "daemon off;"]
+```
+
+===
+## [Ej. Imagen personalizada](#)
+
+index.html
+```html
+<h1>Sitio Web A1</h1>
+```
+
+===
+## [Ej. Imagen personalizada](#)
+
+Construcción
+```bash
+# sudo docker build -t name:tag .
+$ sudo docker build -t mi_servidor_web:1.0 .
+```
+
+===
+## [Ej. Imagen personalizada](#)
+
+<iframe width="560" height="315" src="https://www.youtube.com/embed/3GlaCLLPSiY?si=vwYaJ_IGC1OGIGyc" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+
+---
+## [Cache creación imgs](#)
+
+- [Kubernetes](#) promueve el uso de [imágenes descartables](#) 
+- Esto requiere la [actualización regular](#) de [imágenes](#) para el lanzamiento de nuevas versiones 
+- Docker ofrece un [sistema de caché](#) que agiliza la construcción de imágenes al reutilizar capas previamente creadas 
+
+===
+## [Capas Imagen](#)
+
+![Capas](https://docs.docker.com/build/images/cache-stack-invalidated.png)
+
+===
+## [Ejemplo: archivos](#)
+
+```
+├── app.py
+├── dependencias.txt
+├── Dockerfile
+```
+
+===
+## [Dockerfile sin optimizar](#)
+
+```dockerfile
+FROM python:3.13.0a5-alpine3.19
+COPY . .
+RUN pip install -r dependencias.txt
+EXPOSE 5000
+CMD ["python", "app.py"]
+```
+
+===
+## [Dockerfile optimizado](#)
+
+```dockerfile
+FROM python:3.13.0a5-alpine3.19
+COPY dependencias.txt .
+RUN pip install -r dependencias.txt
+COPY app.py .
+EXPOSE 5000
+CMD ["python", "app.py"]
+```
+
+===
+## [Video Capas y Cache](#)
+
+<iframe width="560" height="315" src="https://www.youtube.com/embed/BRRwt9NlMhI?si=oRTGOhpwBHpxrz79" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+
+---
+## [Imagen a Docker Hub](#)
+
+1. Crear cuenta en Docker Hub 
+1. Crear un repositorio si no se tiene uno
+1. En equipo ejecutar "**docker login**" e ingresar credenciales 
+1. Taggear imagen 
+1. Ejecutar "**docker push**"
+
+===
+## [Imagen a Docker Hub](#)
+
+<iframe width="560" height="315" src="https://www.youtube.com/embed/pxEf13Sxt6Q?si=71k1a3J_y8koe8hP" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+
+				    </textarea>
+				</section>
+			</div>
+		</div>
+
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/5.0.2/reveal.min.js"></script>
+
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/5.0.2/plugin/notes/notes.min.js"></script>
+		
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/5.0.2/plugin/markdown/markdown.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/5.0.2/plugin/highlight/highlight.min.js"></script>
+		<script>			
+			Reveal.initialize({
+				hash: true,
+				plugins: [ RevealMarkdown, RevealHighlight, RevealNotes, RevealMath.KaTeX ]
+			});
+			Reveal.on('ready', e => {
+				// e.previousSlide, e.currentSlide, e.indexh, e.indexv 				
+				const claseSlide = `slide-${e.indexh}-${e.indexv}`
+				document.body.className = `reveal-viewport ${claseSlide}`
+			});
+			Reveal.on('slidechanged', e => {
+				// e.previousSlide, e.currentSlide, e.indexh, e.indexv 				
+				const claseSlide = `slide-${e.indexh}-${e.indexv}`
+				document.body.className = `reveal-viewport ${claseSlide}`
+			});
+		</script>
+	</body>
+</html>
